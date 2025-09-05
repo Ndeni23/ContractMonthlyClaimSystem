@@ -1,0 +1,34 @@
+﻿@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.ClaimViewModel>
+@{
+    ViewData["Title"] = "Administrator Dashboard";
+}
+
+<h3>Claims Awaiting Approval</h3>
+<p>The following claims have been submitted and require review.</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Claim ID</th>
+            <th>Submission Date</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.ClaimId</td>
+                <td>@claim.SubmissionDate.ToShortDateString()</td>
+                <td>@claim.Description</td>
+                <td>@claim.TotalAmount.ToString("C")</td>
+                <td>
+                    <a href="#" class="btn btn-success btn-sm">Approve</a>
+                    <a href="#" class="btn btn-danger btn-sm">Reject</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

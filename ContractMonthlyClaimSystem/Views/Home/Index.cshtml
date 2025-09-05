@@ -1,8 +1,43 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.ClaimViewModel>
+@{
+    ViewData["Title"] = "Lecturer Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3>Your Claims History</h3>
+        <p class="text-muted">An overview of your recent submissions.</p>
+    </div>
+    <a asp-action="SubmitClaim" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Submit New Claim
+    </a>
 </div>
+
+<table class="table table-hover table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Claim ID</th>
+            <th>Submission Date</th>
+            <th>Description</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.ClaimId</td>
+                <td>@claim.SubmissionDate.ToShortDateString()</td>
+                <td>@claim.Description</td>
+                <td>@claim.TotalAmount.ToString("C")</td>
+                <td>
+                    @{
+                        var statusClass = claim.Status == "Approved" ? "bg-success" : (claim.Status == "Submitted" ? "bg-warning text-dark" : "bg-danger");
+                    }
+                    <span class="badge @statusClass">@claim.Status</span>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
