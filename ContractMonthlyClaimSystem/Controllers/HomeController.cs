@@ -8,15 +8,12 @@ namespace ContractMonthlyClaimSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private static List<ClaimViewModel> _claims = new List<ClaimViewModel>
-        {
-            new ClaimViewModel { ClaimId = 1, SubmissionDate = DateTime.Now.AddDays(-30), Description = "August Teaching", Status = "Approved", TotalAmount = 5250.00m },
-            new ClaimViewModel { ClaimId = 2, SubmissionDate = DateTime.Now.AddDays(-2), Description = "September Marking", Status = "Submitted", TotalAmount = 1800.00m }
-        };
+        // The list is now initialized as EMPTY. Claims will only be added
+        // when the user submits the form.
+        private static List<ClaimViewModel> _claims = new List<ClaimViewModel>();
 
         public IActionResult Index()
         {
-            // THIS IS THE FIX: We must pass the list of claims to the View.
             return View(_claims.OrderByDescending(c => c.SubmissionDate).ToList());
         }
 
@@ -30,10 +27,13 @@ namespace ContractMonthlyClaimSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                newClaim.ClaimId = _claims.Count + 1;
+                // To avoid an error on the first claim, we check if the list has any items.
+                newClaim.ClaimId = _claims.Any() ? _claims.Max(c => c.ClaimId) + 1 : 1;
                 newClaim.SubmissionDate = DateTime.Now;
                 newClaim.Status = "Submitted";
+
                 _claims.Add(newClaim);
+
                 return RedirectToAction("Index");
             }
             return View(newClaim);
