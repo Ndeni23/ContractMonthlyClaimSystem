@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations; // Add this for display attributes
+using System.ComponentModel.DataAnnotations;
 
 namespace ContractMonthlyClaimSystem.ViewModels
 {
@@ -8,13 +8,13 @@ namespace ContractMonthlyClaimSystem.ViewModels
         public int ClaimId { get; set; }
         public DateTime SubmissionDate { get; set; }
 
-        [Required] // Makes the field mandatory
+        [Required]
         public string Description { get; set; }
 
-        public string Status { get; set; }
+        public string? Status { get; set; } // <-- ADD '?' HERE
 
         [Required]
-        [Display(Name = "Total Amount")] // This text will appear as the label in the form
+        [Display(Name = "Total Amount")]
         public decimal TotalAmount { get; set; }
     }
 }
