@@ -1,0 +1,44 @@
+﻿@model ContractMonthlyClaimSystem.ViewModels.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <h2 class="text-center">Welcome</h2>
+        <p class="text-center text-muted">Please log in to continue</p>
+        <hr />
+        <section>
+            <form asp-action="Login" method="post">
+
+                <!-- V V V THIS IS THE NEW PART V V V -->
+                <div class="alert alert-info small">
+                    <h5 class="alert-heading">Prototype Login</h5>
+                    <p class="mb-0">Enter one of the following usernames (password can be anything):</p>
+                    <ul>
+                        <li><code>lecturer</code> - To access the Lecturer Dashboard.</li>
+                        <li><code>coordinator</code> - To access the Admin Dashboard.</li>
+                        <li><code>manager</code> - To access the Admin Dashboard.</li>
+                    </ul>
+                </div>
+                <!-- ^ ^ ^ THIS IS THE NEW PART ^ ^ ^ -->
+
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Username" class="form-control" autocomplete="username" aria-required="true" />
+                    <label asp-for="Username"></label>
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+                <div class="form-floating mb-3">
+                    <input asp-for="Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <label asp-for="Password"></label>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

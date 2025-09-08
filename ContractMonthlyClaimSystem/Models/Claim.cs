@@ -10,7 +10,7 @@ namespace ContractMonthlyClaimSystem.Models
         public decimal HoursWorked { get; set; }
         public decimal TotalAmount { get; set; }
         public string Status { get; set; }
-        public string? Comments { get; set; } // <-- ADD '?' HERE
+        public string? Comments { get; set; } 
 
         public int LecturerId { get; set; }
     }

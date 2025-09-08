@@ -1,4 +1,6 @@
-﻿@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.ClaimViewModel>
+﻿@using System.Globalization
+
+@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.ClaimViewModel>
 @{
     ViewData["Title"] = "Administrator Dashboard";
 }
@@ -23,7 +25,7 @@
                 <td>@claim.ClaimId</td>
                 <td>@claim.SubmissionDate.ToShortDateString()</td>
                 <td>@claim.Description</td>
-                <td>@claim.TotalAmount.ToString("C")</td>
+                <td>@claim.TotalAmount.ToString("C", new CultureInfo("en-ZA"))</td>
                 <td>
                     <a href="#" class="btn btn-success btn-sm">Approve</a>
                     <a href="#" class="btn btn-danger btn-sm">Reject</a>

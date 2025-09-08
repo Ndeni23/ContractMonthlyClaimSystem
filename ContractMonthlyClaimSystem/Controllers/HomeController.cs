@@ -8,9 +8,40 @@ namespace ContractMonthlyClaimSystem.Controllers
 {
     public class HomeController : Controller
     {
-        // The list is now initialized as EMPTY. Claims will only be added
-        // when the user submits the form.
-        private static List<ClaimViewModel> _claims = new List<ClaimViewModel>();
+        private static readonly List<ClaimViewModel> _claims = new();
+
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid && model.Username != null)
+            {
+                string role = model.Username.ToLower();
+
+                if (role == "lecturer")
+                {
+                    // --- THIS IS THE CHANGE ---
+                    // If the user is a lecturer, redirect straight to the Submit Claim page.
+                    return RedirectToAction("SubmitClaim");
+                }
+                else if (role == "coordinator" || role == "manager")
+                {
+                    return RedirectToAction("AdminDashboard");
+                }
+            }
+
+            ModelState.AddModelError("", "Invalid username. Please try again.");
+            return View(model);
+        }
+
+        public IActionResult Logout()
+        {
+            return RedirectToAction("Login");
+        }
 
         public IActionResult Index()
         {
@@ -27,7 +58,6 @@ namespace ContractMonthlyClaimSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                // To avoid an error on the first claim, we check if the list has any items.
                 newClaim.ClaimId = _claims.Any() ? _claims.Max(c => c.ClaimId) + 1 : 1;
                 newClaim.SubmissionDate = DateTime.Now;
                 newClaim.Status = "Submitted";
