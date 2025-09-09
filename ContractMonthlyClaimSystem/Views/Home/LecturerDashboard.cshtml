@@ -1,0 +1,41 @@
+﻿@using System.Globalization
+@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.TrackClaimViewModel>
+@{
+    ViewData["Title"] = "Track Claims";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="mb-3">Track Your Submitted Claims</h3>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>User ID</th>
+            <th>Module ID</th>
+            <th>Status</th>
+            <th>Submitted Date</th>
+            <th>Pre-approved Date</th>
+            <th>Finalized Date</th>
+            <th>Document</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in Model)
+        {
+            <tr>
+                <td>@claim.UserId</td>
+                <td>@claim.ModuleId</td>
+                <td>
+                    @{
+                        var statusClass = claim.Status == "Pending" ? "bg-warning text-dark" : (claim.Status == "Pre-approved" ? "bg-info text-dark" : "bg-success");
+                    }
+                    <span class="badge @statusClass">@claim.Status</span>
+                </td>
+                <td>@claim.SubmittedDateTime?.ToShortDateString()</td>
+                <td>@claim.PreApprovedDateTime?.ToShortDateString()</td>
+                <td>@claim.FinalizedDateTime?.ToShortDateString()</td>
+                <td><a href="#">@claim.DocumentName</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

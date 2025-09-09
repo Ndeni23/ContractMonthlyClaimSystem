@@ -1,20 +1,9 @@
-﻿@using System.Globalization
-
-@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.ClaimViewModel>
-@{
-    ViewData["Title"] = "Administrator Dashboard";
-}
-
-<h3>Claims Awaiting Approval</h3>
-<p>The following claims have been submitted and require review.</p>
-
-<table class="table table-bordered">
-    <thead>
+﻿<table class="table table-bordered table-hover">
+    <thead class="table-dark">
         <tr>
             <th>Claim ID</th>
             <th>Submission Date</th>
             <th>Description</th>
-            <th>Amount</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -25,7 +14,6 @@
                 <td>@claim.ClaimId</td>
                 <td>@claim.SubmissionDate.ToShortDateString()</td>
                 <td>@claim.Description</td>
-                <td>@claim.TotalAmount.ToString("C", new CultureInfo("en-ZA"))</td>
                 <td>
                     <a href="#" class="btn btn-success btn-sm">Approve</a>
                     <a href="#" class="btn btn-danger btn-sm">Reject</a>

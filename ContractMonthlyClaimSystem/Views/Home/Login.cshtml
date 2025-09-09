@@ -6,39 +6,48 @@
 
 <div class="row justify-content-center">
     <div class="col-md-5">
-        <h2 class="text-center">Welcome</h2>
-        <p class="text-center text-muted">Please log in to continue</p>
-        <hr />
-        <section>
-            <form asp-action="Login" method="post">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h2 class="card-title text-center mb-1">Welcome back</h2>
+                <p class="card-text text-center text-muted mb-4">Sign in with your email and role to continue</p>
 
-                <!-- V V V THIS IS THE NEW PART V V V -->
-                <div class="alert alert-info small">
-                    <h5 class="alert-heading">Prototype Login</h5>
-                    <p class="mb-0">Enter one of the following usernames (password can be anything):</p>
-                    <ul>
-                        <li><code>lecturer</code> - To access the Lecturer Dashboard.</li>
-                        <li><code>coordinator</code> - To access the Admin Dashboard.</li>
-                        <li><code>manager</code> - To access the Admin Dashboard.</li>
-                    </ul>
-                </div>
-                <!-- ^ ^ ^ THIS IS THE NEW PART ^ ^ ^ -->
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Username" class="form-control" autocomplete="username" aria-required="true" />
-                    <label asp-for="Username"></label>
-                    <span asp-validation-for="Username" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-3">
-                    <input asp-for="Password" class="form-control" autocomplete="current-password" aria-required="true" />
-                    <label asp-for="Password"></label>
-                    <span asp-validation-for="Password" class="text-danger"></span>
-                </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-            </form>
-        </section>
+                    <!-- V V V THIS IS THE CORRECTED PART V V V -->
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" placeholder="your email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <!-- ^ ^ ^ THIS IS THE CORRECTED PART ^ ^ ^ -->
+
+                    <div class="mb-3">
+                        <label asp-for="Role" class="form-label"></label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="">Select a role...</option>
+                            <option value="Lecturer">Lecturer</option>
+                            <option value="Programme Coordinator">Programme Coordinator</option>
+                            <option value="Academic Manager">Academic Manager</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" placeholder="your password" />
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="#">Forgot password?</a> | <a href="#">Register</a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
