@@ -17,49 +17,12 @@ namespace ContractMonthlyClaimSystem.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "8.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.Claim", b =>
-                {
-                    b.Property<int>("ClaimId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClaimId"));
-
-                    b.Property<string>("Comments")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("HourlyRate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("HoursWorked")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("LecturerId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("SubmissionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("ClaimId");
-
-                    b.HasIndex("LecturerId");
-
-                    b.ToTable("Claims");
-                });
-
-            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.SupportingDocument", b =>
+            modelBuilder.Entity("ContractMonthlyClaimSystem.Controllers.SupportingDocument", b =>
                 {
                     b.Property<int>("DocumentId")
                         .ValueGeneratedOnAdd()
@@ -85,6 +48,42 @@ namespace ContractMonthlyClaimSystem.Migrations
                     b.ToTable("SupportingDocuments");
                 });
 
+            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.Claim", b =>
+                {
+                    b.Property<int>("ClaimId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClaimId"));
+
+                    b.Property<string>("Comments")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HourlyRate")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("HoursWorked")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("LecturerId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SubmissionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TotalAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("ClaimId");
+
+                    b.HasIndex("LecturerId");
+
+                    b.ToTable("Claims");
+                });
+
             modelBuilder.Entity("ContractMonthlyClaimSystem.Models.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -92,11 +91,6 @@ namespace ContractMonthlyClaimSystem.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("nvarchar(8)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -121,34 +115,9 @@ namespace ContractMonthlyClaimSystem.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("Users");
-
-                    b.HasDiscriminator().HasValue("User");
-
-                    b.UseTphMappingStrategy();
                 });
 
-            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.Lecturer", b =>
-                {
-                    b.HasBaseType("ContractMonthlyClaimSystem.Models.User");
-
-                    b.Property<decimal>("HourlyRate")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasDiscriminator().HasValue("Lecturer");
-                });
-
-            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.Claim", b =>
-                {
-                    b.HasOne("ContractMonthlyClaimSystem.Models.Lecturer", "Lecturer")
-                        .WithMany()
-                        .HasForeignKey("LecturerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lecturer");
-                });
-
-            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.SupportingDocument", b =>
+            modelBuilder.Entity("ContractMonthlyClaimSystem.Controllers.SupportingDocument", b =>
                 {
                     b.HasOne("ContractMonthlyClaimSystem.Models.Claim", "Claim")
                         .WithMany("SupportingDocuments")
@@ -157,6 +126,17 @@ namespace ContractMonthlyClaimSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("Claim");
+                });
+
+            modelBuilder.Entity("ContractMonthlyClaimSystem.Models.Claim", b =>
+                {
+                    b.HasOne("ContractMonthlyClaimSystem.Models.User", "Lecturer")
+                        .WithMany()
+                        .HasForeignKey("LecturerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lecturer");
                 });
 
             modelBuilder.Entity("ContractMonthlyClaimSystem.Models.Claim", b =>

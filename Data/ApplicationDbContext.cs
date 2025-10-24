@@ -1,6 +1,6 @@
-﻿using ContractMonthlyClaimSystem.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
+﻿using ContractMonthlyClaimSystem.Controllers;
+using ContractMonthlyClaimSystem.Models;
+using Microsoft.EntityFrameworkCore; // <-- Ensures EF Core is referenced
 
 namespace ContractMonthlyClaimSystem.Data
 {
@@ -10,7 +10,6 @@ namespace ContractMonthlyClaimSystem.Data
         {
         }
 
-        // These properties will become tables in our database
         public DbSet<User> Users { get; set; }
         public DbSet<Claim> Claims { get; set; }
         public DbSet<SupportingDocument> SupportingDocuments { get; set; }

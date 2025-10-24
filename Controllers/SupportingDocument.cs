@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ContractMonthlyClaimSystem.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ContractMonthlyClaimSystem.Models
+namespace ContractMonthlyClaimSystem.Controllers
 {
     public class SupportingDocument
     {

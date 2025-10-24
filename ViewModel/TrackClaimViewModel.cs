@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ContractMonthlyClaimSystem.ViewModels
+namespace ContractMonthlyClaimSystem.ViewModel
 {
     public class TrackClaimViewModel
     {

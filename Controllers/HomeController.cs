@@ -1,6 +1,6 @@
 using ContractMonthlyClaimSystem.Data;
 using ContractMonthlyClaimSystem.Models;
-using ContractMonthlyClaimSystem.ViewModels;
+using ContractMonthlyClaimSystem.ViewModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,11 +23,9 @@ namespace ContractMonthlyClaimSystem.Controllers
             _hostEnvironment = hostEnvironment;
         }
 
-        // --- ERROR HANDLING ---
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error() { return View(); }
 
-        // --- AUTHENTICATION ---
         public IActionResult Login() { return View(); }
 
         [HttpPost]
@@ -35,9 +33,13 @@ namespace ContractMonthlyClaimSystem.Controllers
         {
             try
             {
-                if (model.Email != null && model.Role != null)
+                if (!string.IsNullOrEmpty(model.Email) && !string.IsNullOrEmpty(model.Password) && !string.IsNullOrEmpty(model.Role))
                 {
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower() && u.Role == model.Role);
+                    var user = await _context.Users.FirstOrDefaultAsync(u =>
+                        u.Email.ToLower() == model.Email.ToLower() &&
+                        u.Role == model.Role &&
+                        u.Password == model.Password);
+
                     if (user != null)
                     {
                         HttpContext.Session.SetInt32("UserId", user.UserId);
@@ -60,11 +62,14 @@ namespace ContractMonthlyClaimSystem.Controllers
         {
             try
             {
-                var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
-                if (existingUser != null)
+                if (!string.IsNullOrEmpty(model.Email))
                 {
-                    ModelState.AddModelError("Email", "An account with this email address already exists.");
-                    return View(model);
+                    var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
+                    if (existingUser != null)
+                    {
+                        ModelState.AddModelError("Email", "An account with this email address already exists.");
+                        return View(model);
+                    }
                 }
                 var newUser = new User { FirstName = model.FirstName, LastName = model.LastName, Email = model.Email, Role = model.Role, Password = model.Password };
                 _context.Users.Add(newUser);
@@ -75,8 +80,6 @@ namespace ContractMonthlyClaimSystem.Controllers
         }
 
         public IActionResult Logout() { HttpContext.Session.Clear(); return RedirectToAction("Login"); }
-
-        // --- DASHBOARDS AND FORMS ---
 
         public async Task<IActionResult> LecturerDashboard()
         {
@@ -93,31 +96,58 @@ namespace ContractMonthlyClaimSystem.Controllers
 
         public IActionResult SubmitClaim() { ViewData["UserRole"] = HttpContext.Session.GetString("UserRole"); return View(); }
 
+        // --- THIS IS THE TEMPORARY DEBUGGING VERSION ---
+        // The try-catch block has been removed to expose the real error.
         [HttpPost]
         public async Task<IActionResult> SubmitClaim(ClaimViewModel model, IFormFile supportingDocument)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                var lecturerId = HttpContext.Session.GetInt32("UserId");
-                if (lecturerId == null) { return RedirectToAction("Login"); }
-                var newClaim = new Claim { LecturerId = lecturerId.Value, HoursWorked = model.HoursWorked, HourlyRate = model.HourlyRate, TotalAmount = model.HoursWorked * model.HourlyRate, SubmissionDate = DateTime.Now, Status = "Submitted", Comments = model.Description };
-                _context.Claims.Add(newClaim);
-                await _context.SaveChangesAsync();
-                if (supportingDocument != null && supportingDocument.Length > 0)
-                {
-                    string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
-                    Directory.CreateDirectory(uploadsFolder);
-                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + supportingDocument.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create)) { await supportingDocument.CopyToAsync(fileStream); }
-                    var documentRecord = new SupportingDocument { FileName = supportingDocument.FileName, FilePath = uniqueFileName, ClaimId = newClaim.ClaimId };
-                    _context.SupportingDocuments.Add(documentRecord);
-                    await _context.SaveChangesAsync();
-                }
-                return RedirectToAction("LecturerDashboard");
+                ViewData["UserRole"] = HttpContext.Session.GetString("UserRole");
+                return View(model);
             }
-            catch (Exception) { return RedirectToAction("Error"); }
+
+            var lecturerId = HttpContext.Session.GetInt32("UserId");
+            if (lecturerId == null) { return RedirectToAction("Login"); }
+
+            var newClaim = new Claim
+            {
+                LecturerId = lecturerId.Value,
+                HoursWorked = model.HoursWorked,
+                HourlyRate = model.HourlyRate,
+                TotalAmount = model.HoursWorked * model.HourlyRate,
+                SubmissionDate = DateTime.Now,
+                Status = "Submitted",
+                Comments = model.Description
+            };
+            _context.Claims.Add(newClaim);
+            await _context.SaveChangesAsync();
+
+            if (supportingDocument != null && supportingDocument.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder);
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + supportingDocument.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await supportingDocument.CopyToAsync(fileStream);
+                }
+                var documentRecord = new SupportingDocument
+                {
+                    FileName = supportingDocument.FileName,
+                    FilePath = uniqueFileName,
+                    ClaimId = newClaim.ClaimId
+                };
+                _context.SupportingDocuments.Add(documentRecord);
+
+                // The error is likely happening on the next line. This will now cause a crash.
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("LecturerDashboard");
         }
+        // --- END OF DEBUGGING VERSION ---
 
         public async Task<IActionResult> AdminDashboard()
         {
