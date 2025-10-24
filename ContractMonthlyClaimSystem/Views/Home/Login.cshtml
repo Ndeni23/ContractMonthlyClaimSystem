@@ -12,17 +12,17 @@
                 <p class="card-text text-center text-muted mb-4">Sign in with your email and role to continue</p>
 
                 <form asp-action="Login" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                    <!-- V V V THIS IS THE CORRECTED PART V V V -->
                     <div class="mb-3">
                         <label asp-for="Email" class="form-label"></label>
                         <input asp-for="Email" class="form-control" placeholder="your email" />
-                        <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    <!-- ^ ^ ^ THIS IS THE CORRECTED PART ^ ^ ^ -->
 
                     <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" placeholder="your password" />
+                    </div>
+
+                    <div class="mb-4">
                         <label asp-for="Role" class="form-label"></label>
                         <select asp-for="Role" class="form-select">
                             <option value="">Select a role...</option>
@@ -30,13 +30,6 @@
                             <option value="Programme Coordinator">Programme Coordinator</option>
                             <option value="Academic Manager">Academic Manager</option>
                         </select>
-                        <span asp-validation-for="Role" class="text-danger"></span>
-                    </div>
-
-                    <div class="mb-4">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" placeholder="your password" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
                     <div class="d-grid">
@@ -44,7 +37,7 @@
                     </div>
 
                     <div class="text-center mt-4">
-                        <a href="#">Forgot password?</a> | <a href="#">Register</a>
+                        <a href="#">Forgot password?</a> | <a asp-action="Register">Register</a>
                     </div>
                 </form>
             </div>
