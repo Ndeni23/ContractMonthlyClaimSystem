@@ -1,9 +1,19 @@
-﻿<table class="table table-bordered table-hover">
+﻿@model IEnumerable<ContractMonthlyClaimSystem.Models.Claim>
+@{
+    ViewData["Title"] = "Pre-Approve Claims";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="mb-3">Claims Awaiting Pre-Approval</h3>
+
+<table class="table table-bordered table-hover">
     <thead class="table-dark">
         <tr>
             <th>Claim ID</th>
+            <th>Lecturer</th>
             <th>Submission Date</th>
-            <th>Description</th>
+            <th>Hours</th>
+            <th>Total Amount</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -12,11 +22,17 @@
         {
             <tr>
                 <td>@claim.ClaimId</td>
+                <td>@claim.Lecturer.FirstName @claim.Lecturer.LastName</td>
                 <td>@claim.SubmissionDate.ToShortDateString()</td>
-                <td>@claim.Description</td>
+                <td>@claim.HoursWorked</td>
+                <td>@claim.TotalAmount.ToString("C", new System.Globalization.CultureInfo("en-ZA"))</td>
                 <td>
-                    <a href="#" class="btn btn-success btn-sm">Approve</a>
-                    <a href="#" class="btn btn-danger btn-sm">Reject</a>
+                    <!-- Form to handle Pre-Approval -->
+                    <form asp-action="ProcessPreApproval" method="post" class="d-inline">
+                        <input type="hidden" name="claimId" value="@claim.ClaimId" />
+                        <button type="submit" name="decision" value="Pre-approved" class="btn btn-success btn-sm">Pre-Approve</button>
+                        <button type="submit" name="decision" value="Rejected" class="btn btn-danger btn-sm">Reject</button>
+                    </form>
                 </td>
             </tr>
         }

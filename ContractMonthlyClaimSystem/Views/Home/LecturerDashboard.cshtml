@@ -1,40 +1,61 @@
-﻿@using System.Globalization
-@model IEnumerable<ContractMonthlyClaimSystem.ViewModels.TrackClaimViewModel>
+﻿@model IEnumerable<ContractMonthlyClaimSystem.Models.Claim>
 @{
-    ViewData["Title"] = "Track Claims";
+    ViewData["Title"] = "Track My Claims";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h3 class="mb-3">Track Your Submitted Claims</h3>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>My Claims History</h3>
+    <a asp-action="SubmitClaim" class="btn btn-primary">Submit New Claim</a>
+</div>
 
 <table class="table table-bordered table-hover">
     <thead class="table-dark">
         <tr>
-            <th>User ID</th>
-            <th>Module ID</th>
+            <th>Claim ID</th>
+            <th>Submission Date</th>
+            <th>Description</th>
+            <th>Total Amount</th>
             <th>Status</th>
-            <th>Submitted Date</th>
-            <th>Pre-approved Date</th>
-            <th>Finalized Date</th>
             <th>Document</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var claim in Model)
+        @if (Model.Any())
+        {
+            @foreach (var claim in Model)
+            {
+                <tr>
+                    <td>@claim.ClaimId</td>
+                    <td>@claim.SubmissionDate.ToShortDateString()</td>
+                    <td>@claim.Comments</td>
+                    <td>@claim.TotalAmount.ToString("C", new System.Globalization.CultureInfo("en-ZA"))</td>
+                    <td>
+                        @{
+                            var statusClass = claim.Status == "Submitted" ? "bg-warning text-dark" :
+                            (claim.Status == "Pre-approved" ? "bg-info text-dark" :
+                            (claim.Status == "Approved" ? "bg-success" : "bg-danger"));
+                        }
+                        <span class="badge @statusClass">@claim.Status</span>
+                    </td>
+                    <td>
+                        @if (claim.SupportingDocuments != null && claim.SupportingDocuments.Any())
+                        {
+                            // In a real app, this would be a download link. For now, it just displays the name.
+                            <span>@claim.SupportingDocuments.First().FileName</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">No document</span>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+        else
         {
             <tr>
-                <td>@claim.UserId</td>
-                <td>@claim.ModuleId</td>
-                <td>
-                    @{
-                        var statusClass = claim.Status == "Pending" ? "bg-warning text-dark" : (claim.Status == "Pre-approved" ? "bg-info text-dark" : "bg-success");
-                    }
-                    <span class="badge @statusClass">@claim.Status</span>
-                </td>
-                <td>@claim.SubmittedDateTime?.ToShortDateString()</td>
-                <td>@claim.PreApprovedDateTime?.ToShortDateString()</td>
-                <td>@claim.FinalizedDateTime?.ToShortDateString()</td>
-                <td><a href="#">@claim.DocumentName</a></td>
+                <td colspan="6" class="text-center">You have not submitted any claims yet.</td>
             </tr>
         }
     </tbody>

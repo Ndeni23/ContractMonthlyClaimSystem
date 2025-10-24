@@ -1,11 +1,13 @@
 using ContractMonthlyClaimSystem.Data;
 using ContractMonthlyClaimSystem.Models;
 using ContractMonthlyClaimSystem.ViewModels;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,111 +16,83 @@ namespace ContractMonthlyClaimSystem.Controllers
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public HomeController(ApplicationDbContext context)
+        public HomeController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
 
-        // --- Hard-coded data for Track Claims page (to be replaced later) ---
-        private static readonly List<TrackClaimViewModel> _trackedClaims = new()
-        {
-            new TrackClaimViewModel { UserId = 101, ModuleId = 501, Sessions = 10, Hours = 15, Status = "Pending",      SubmittedDateTime = new DateTime(2025, 9, 1, 8, 15, 0), DocumentName = "claim1.pdf" },
-            new TrackClaimViewModel { UserId = 102, ModuleId = 502, Sessions = 8,  Hours = 12, Status = "Pre-approved", SubmittedDateTime = new DateTime(2025, 9, 2, 10, 0, 0), PreApprovedDateTime = new DateTime(2025, 9, 3, 12, 0, 0), DocumentName = "claim2.pdf" },
-            new TrackClaimViewModel { UserId = 103, ModuleId = 503, Sessions = 12, Hours = 18, Status = "Approved",     SubmittedDateTime = new DateTime(2025, 9, 5, 14, 30, 0), PreApprovedDateTime = new DateTime(2025, 9, 6, 9, 0, 0), FinalizedDateTime = new DateTime(2025, 9, 7, 11, 0, 0), DocumentName = "claim3.pdf" }
-        };
-
-        // --- LOGIN, LOGOUT, REGISTER ---
-
-        public IActionResult Login()
-        {
-            return View();
-        }
+        public IActionResult Login() { return View(); }
 
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (model.Email != null && model.Role != null)
             {
-                // Find the user in the database by their email and role.
-                // In a real app, you would also verify the hashed password.
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower() && u.Role == model.Role);
-
                 if (user != null)
                 {
-                    // Store user's ID and Role in the session to "log them in"
                     HttpContext.Session.SetInt32("UserId", user.UserId);
                     HttpContext.Session.SetString("UserRole", user.Role);
-
-                    // Redirect based on role
-                    if (user.Role == "Lecturer")
-                    {
-                        return RedirectToAction("SubmitClaim");
-                    }
-                    else if (user.Role == "Programme Coordinator")
-                    {
-                        return RedirectToAction("AdminDashboard");
-                    }
-                    else if (user.Role == "Academic Manager")
-                    {
-                        return RedirectToAction("ManagerDashboard");
-                    }
+                    if (user.Role == "Lecturer") { return RedirectToAction("SubmitClaim"); }
+                    else if (user.Role == "Programme Coordinator") { return RedirectToAction("AdminDashboard"); }
+                    else if (user.Role == "Academic Manager") { return RedirectToAction("ManagerDashboard"); }
                 }
             }
-
             ModelState.AddModelError("", "Invalid email, password, or role.");
             return View(model);
         }
 
-        public IActionResult Register()
-        {
-            return View();
-        }
+        public IActionResult Register() { return View(); }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            // Check if a user with this email already exists to prevent duplicates
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
             if (existingUser != null)
             {
                 ModelState.AddModelError("Email", "An account with this email address already exists.");
                 return View(model);
             }
-
-            // Create a new User object from the view model data
             var newUser = new User
             {
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Email = model.Email,
                 Role = model.Role,
-                // IMPORTANT: In a real app, you would HASH this password. For this prototype, we store it as plain text.
                 Password = model.Password
             };
-
-            // Add the new user to the context and save it to the database
             _context.Users.Add(newUser);
             await _context.SaveChangesAsync();
-
-            // Redirect to the login page after successful registration
             return RedirectToAction("Login");
         }
 
-        public IActionResult Logout()
-        {
-            // Clear the session to log the user out
-            HttpContext.Session.Clear();
-            return RedirectToAction("Login");
-        }
+        public IActionResult Logout() { HttpContext.Session.Clear(); return RedirectToAction("Login"); }
 
-        // --- DASHBOARDS AND FORMS ---
-
-        public IActionResult LecturerDashboard()
+        public async Task<IActionResult> LecturerDashboard()
         {
             ViewData["UserRole"] = HttpContext.Session.GetString("UserRole");
-            // For now, this still shows hard-coded data. We will make this dynamic later.
-            return View(_trackedClaims);
+
+            // Get the ID of the currently logged-in lecturer
+            var lecturerId = HttpContext.Session.GetInt32("UserId");
+
+            // If no one is logged in, redirect to the login page
+            if (lecturerId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Fetch all claims from the database that belong to THIS lecturer.
+            // Also include the related document data for each claim.
+            var userClaims = await _context.Claims
+                                        .Where(c => c.LecturerId == lecturerId.Value)
+                                        .Include(c => c.SupportingDocuments) // Eagerly load the documents
+                                        .OrderByDescending(c => c.SubmissionDate)
+                                        .ToListAsync();
+
+            return View(userClaims);
         }
 
         public IActionResult SubmitClaim()
@@ -130,33 +104,84 @@ namespace ContractMonthlyClaimSystem.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitClaim(ClaimViewModel model, IFormFile supportingDocument)
         {
-            // Get the ID of the currently logged-in user from the session
             var lecturerId = HttpContext.Session.GetInt32("UserId");
-
-            // Security check: If no one is logged in, redirect them to the login page
-            if (lecturerId == null)
-            {
-                return RedirectToAction("Login");
-            }
-
-            // Create a new Claim DATABASE model from the form's view model data
+            if (lecturerId == null) { return RedirectToAction("Login"); }
             var newClaim = new Claim
             {
                 LecturerId = lecturerId.Value,
                 HoursWorked = model.HoursWorked,
                 HourlyRate = model.HourlyRate,
-                TotalAmount = model.HoursWorked * model.HourlyRate, // Calculate the total
+                TotalAmount = model.HoursWorked * model.HourlyRate,
                 SubmissionDate = DateTime.Now,
-                Status = "Submitted", // Set the initial status
-                Comments = model.Description // Using the description field for comments/notes
+                Status = "Submitted",
+                Comments = model.Description
             };
-
-            // Add the new claim to the context and save it to the database
             _context.Claims.Add(newClaim);
             await _context.SaveChangesAsync();
-
-            // After saving, redirect the lecturer to their dashboard to see the new claim
+            if (supportingDocument != null && supportingDocument.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder);
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + supportingDocument.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await supportingDocument.CopyToAsync(fileStream);
+                }
+                var documentRecord = new SupportingDocument
+                {
+                    FileName = supportingDocument.FileName,
+                    FilePath = uniqueFileName,
+                    ClaimId = newClaim.ClaimId
+                };
+                _context.SupportingDocuments.Add(documentRecord);
+                await _context.SaveChangesAsync();
+            }
             return RedirectToAction("LecturerDashboard");
+        }
+
+        public async Task<IActionResult> AdminDashboard()
+        {
+            ViewData["UserRole"] = HttpContext.Session.GetString("UserRole");
+            var pendingClaims = await _context.Claims
+                                        .Include(c => c.Lecturer)
+                                        .Where(c => c.Status == "Submitted")
+                                        .ToListAsync();
+            return View(pendingClaims);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessPreApproval(int claimId, string decision)
+        {
+            var claim = await _context.Claims.FindAsync(claimId);
+            if (claim != null)
+            {
+                claim.Status = decision;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("AdminDashboard");
+        }
+
+        public async Task<IActionResult> ManagerDashboard()
+        {
+            ViewData["UserRole"] = HttpContext.Session.GetString("UserRole");
+            var preApprovedClaims = await _context.Claims
+                                            .Include(c => c.Lecturer)
+                                            .Where(c => c.Status == "Pre-approved")
+                                            .ToListAsync();
+            return View(preApprovedClaims);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ProcessFinalApproval(int claimId, string decision)
+        {
+            var claim = await _context.Claims.FindAsync(claimId);
+            if (claim != null)
+            {
+                claim.Status = decision;
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("ManagerDashboard");
         }
     }
 }
