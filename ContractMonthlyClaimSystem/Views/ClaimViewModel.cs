@@ -1,20 +1,21 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace ContractMonthlyClaimSystem.ViewModels
 {
     public class ClaimViewModel
     {
         public int ClaimId { get; set; }
-        public DateTime SubmissionDate { get; set; }
 
-        [Required]
+        [Display(Name = "Description / Module Name")]
         public string Description { get; set; }
 
-        public string? Status { get; set; } // <-- ADD '?' HERE
+        [Display(Name = "Hours Worked")]
+        public decimal HoursWorked { get; set; }
 
-        [Required]
-        [Display(Name = "Total Amount")]
-        public decimal TotalAmount { get; set; }
+        [Display(Name = "Hourly Rate")]
+        public decimal HourlyRate { get; set; }
+
+        public string? Status { get; set; }
+        public DateTime SubmissionDate { get; set; }
     }
 }
