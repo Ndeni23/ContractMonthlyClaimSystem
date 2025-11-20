@@ -1,47 +1,61 @@
-﻿@using ContractMonthlyClaimSystem.ViewModel
-@model LoginViewModel
+﻿@model ContractMonthlyClaimSystem.ViewModel.LoginViewModel
+
 @{
     ViewData["Title"] = "Login";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <h2 class="card-title text-center mb-1">Welcome back</h2>
-                <p class="card-text text-center text-muted mb-4">Sign in with your email and role to continue</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow">
+                <div class="card-header bg-white text-center">
+                    <h2 class="fw-bold">Welcome back</h2>
+                    <p class="text-muted">Sign in with your email and role to continue</p>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-                <form asp-action="Login" method="post">
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label"></label>
-                        <input asp-for="Email" class="form-control" placeholder="your email" />
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label">Email (username)</label>
+                            <input asp-for="Email" class="form-control" placeholder="your email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label"></label>
-                        <input asp-for="Password" class="form-control" placeholder="your password" />
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label">Password</label>
+                            <input asp-for="Password" type="password" class="form-control" placeholder="your password" />
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
 
-                    <div class="mb-4">
-                        <label asp-for="Role" class="form-label"></label>
-                        <select asp-for="Role" class="form-select">
-                            <option value="">Select a role...</option>
-                            <option value="Lecturer">Lecturer</option>
-                            <option value="Programme Coordinator">Programme Coordinator</option>
-                            <option value="Academic Manager">Academic Manager</option>
-                        </select>
-                    </div>
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label">Role</label>
+                            <select asp-for="Role" class="form-select">
+                                <option value="">Select a role...</option>
+                                <option value="Lecturer">Lecturer</option>
+                                <option value="Programme Coordinator">Programme Coordinator</option>
+                                <option value="Academic Manager">Academic Manager</option>
+                                <!-- UPDATE: HR Option Added Here -->
+                                <option value="HR">HR (Human Resources)</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary btn-lg">Sign in</button>
-                    </div>
-
-                    <div class="text-center mt-4">
-                        <a href="#">Forgot password?</a> | <a asp-action="Register">Register</a>
-                    </div>
-                </form>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-dark">Sign in</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-white border-0">
+                    <a asp-action="Register">Need an account? Register here</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,60 @@
+﻿@model ContractMonthlyClaimSystem.Models.User
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="card-title mb-0"><i class="fas fa-user-edit"></i> Manage Profile</h3>
+                </div>
+                <div class="card-body">
+                    @if (ViewData["Message"] != null)
+                    {
+                        <div class="alert alert-success">@ViewData["Message"]</div>
+                    }
+
+                    <form asp-action="UpdateProfile" method="post">
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="Role" />
+
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" required />
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" required />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input asp-for="Email" class="form-control" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input asp-for="Password" class="form-control" required />
+                            <small class="text-muted">Update your password here if needed.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Role</label>
+                            <input asp-for="Role" class="form-control" readonly disabled />
+                            <small class="text-muted">Roles cannot be changed manually.</small>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
