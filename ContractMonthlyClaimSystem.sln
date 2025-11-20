@@ -1,13 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.11217.181 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContractMonthlyClaimSystem", "ContractMonthlyClaimSystem.csproj", "{F2B4CB2A-0F74-53DD-6D07-594BB46594A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMCS.Tests", "CMCS.Tests\CMCS.Tests.csproj", "{6789C35A-282A-B2EE-B725-054C49F544FA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMSC.Tests", "..\CMSC.Tests\CMSC.Tests.csproj", "{BE8F4CC0-1F35-4463-9850-88880C330B0F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CMCS.UnitTests", "..\CMCS.UnitTests\CMCS.UnitTests.csproj", "{8340311A-5608-43ED-BAB2-9A630D09B7AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{6789C35A-282A-B2EE-B725-054C49F544FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6789C35A-282A-B2EE-B725-054C49F544FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6789C35A-282A-B2EE-B725-054C49F544FA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BE8F4CC0-1F35-4463-9850-88880C330B0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BE8F4CC0-1F35-4463-9850-88880C330B0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BE8F4CC0-1F35-4463-9850-88880C330B0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BE8F4CC0-1F35-4463-9850-88880C330B0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8340311A-5608-43ED-BAB2-9A630D09B7AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8340311A-5608-43ED-BAB2-9A630D09B7AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8340311A-5608-43ED-BAB2-9A630D09B7AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8340311A-5608-43ED-BAB2-9A630D09B7AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
