@@ -1,88 +1,102 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-g" />
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ContractMonthlyClaimSystem</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ContractMonthlyClaimSystem.styles.css" asp-append-version="true" />
+    <title>@ViewData["Title"] - Contract Monthly Claim System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,.1);
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+        }
+
+        footer {
+            background-color: white;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
 </head>
 <body>
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-
-                <!-- V V V THIS IS THE CORRECTED LINK V V V -->
-                <a class="navbar-brand" asp-controller="Home" asp-action="Login">ContractMonthlyClaimSystem</a>
-
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand fw-bold text-primary" asp-controller="Home" asp-action="Login">
+                    <i class="fas fa-file-invoice-dollar"></i> CMCS
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    @{
-                        var userRole = ViewData["UserRole"] as string;
-                    }
-
-                    <!-- Main Navigation links -->
                     <ul class="navbar-nav flex-grow-1">
+                        @{
+                            var userRole = HttpContextAccessor.HttpContext.Session.GetString("UserRole");
+                        }
+
                         @if (userRole == "Lecturer")
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="LecturerDashboard">Track Claims</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="SubmitClaim">Submit Claim</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="LecturerDashboard">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark fw-bold" asp-controller="Home" asp-action="SubmitClaim">Submit New Claim</a></li>
                         }
                         else if (userRole == "Programme Coordinator")
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="AdminDashboard">Pre-Approve Claims</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="AdminDashboard">Coordinator Dashboard</a></li>
                         }
                         else if (userRole == "Academic Manager")
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="ManagerDashboard">Final Approval</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="ManagerDashboard">Manager Dashboard</a></li>
+                        }
+                        else if (userRole == "HR")
+                        {
+                            <li class="nav-item"><a class="nav-link text-dark fw-bold" asp-controller="Home" asp-action="HRDashboard">HR Reporting</a></li>
                         }
                     </ul>
-
-                    <!-- Welcome & Logout section -->
                     <ul class="navbar-nav">
-                        @if (!string.IsNullOrEmpty(userRole))
+                        @if (string.IsNullOrEmpty(userRole))
                         {
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Register">Register</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-controller="Home" asp-action="Login">Login</a></li>
+                        }
+                        else
+                        {
+                            <!-- NEW PROFILE LINK -->
                             <li class="nav-item">
-                                <span class="navbar-text me-3">
-                                    Welcome, <strong>@userRole</strong>
-                                </span>
+                                <a class="nav-link text-primary fw-bold" asp-controller="Home" asp-action="Profile">My Profile</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="Logout">Logout</a>
-                            </li>
+                            <li class="nav-item"><span class="nav-link text-muted">| <strong>@userRole</strong></span></li>
+                            <li class="nav-item"><a class="nav-link text-danger" asp-controller="Home" asp-action="Logout">Logout</a></li>
                         }
                     </ul>
                 </div>
-            </div> <!-- THIS IS THE MISSING CLOSING TAG -->
+            </div>
         </nav>
     </header>
-
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - ContractMonthlyClaimSystem
-        </div>
+    <footer class="border-top footer text-muted mt-5 pt-3">
+        <div class="container text-center">&copy; 2025 - CMCS</div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
