@@ -13,7 +13,7 @@ namespace ContractMonthlyClaimSystem.ViewModel
         public string Description { get; set; }
 
         [Required(ErrorMessage = "Hours Worked is required.")]
-        [Range(0.1, 100, ErrorMessage = "Hours must be between 0.1 and 100.")]
+        [Range(0.1, 200, ErrorMessage = "Hours must be between 0.1 and 100.")]
         [Display(Name = "Hours Worked")]
         public decimal HoursWorked { get; set; }
 
